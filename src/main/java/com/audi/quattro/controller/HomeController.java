@@ -1,7 +1,6 @@
 package com.audi.quattro.controller;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -14,6 +13,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.conf.ConfigurationBuilder;
+import facebook4j.internal.org.json.JSONArray;
+import facebook4j.internal.org.json.JSONException;
+import facebook4j.internal.org.json.JSONObject;
 import twitter4j.Query;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -47,6 +53,8 @@ public class HomeController {
 	@Value("${twitter.hashtag}")
 	private String twitterHashTag;
 		
+	
+	
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
@@ -62,6 +70,8 @@ public class HomeController {
 			e.printStackTrace();			
 		}
 		
+    	getFacebookFeeds();
+    	
 		return "home";
 	}
 	
@@ -87,6 +97,65 @@ public class HomeController {
         return tweets;
 	}
 	
+	private void getFacebookFeeds() {
+		//Facebook facebook = new FacebookFactory().getInstance();		
+		//facebook.setOAuthAppId("617321221655345", "0dac6987961e1eb770734913a3988f85");
+		//facebook.setOAuthPermissions(commaSeparetedPermissions);				
+		//facebook.setOAuthAccessToken(new facebook4j.auth.AccessToken("617321221655345|pfc-BNyh_SfvXvTigjSguBC4xJU"));
+		//.setOAuthAccessToken(new AccessToken("57f5ad619084289f0a32d724da8e5c9a", null));
+		
+		// Get an access token from: 
+		// https://developers.facebook.com/tools/explorer
+		// Copy and paste it below.
+		//String accessTokenString = "617321221655345|pfc-BNyh_SfvXvTigjSguBC4xJU";
+		//facebook4j.auth.AccessToken at = new facebook4j.auth.AccessToken(accessTokenString);
+		// Set access token.
+		//facebook.setOAuthAccessToken(at);
+		
+		
+		ConfigurationBuilder cb = new ConfigurationBuilder();
+		cb.setDebugEnabled(true)
+		  .setOAuthAppId("617321221655345")
+		  .setOAuthAppSecret("0dac6987961e1eb770734913a3988f85")
+		  //.setOAuthAccessToken("617321221655345|pfc-BNyh_SfvXvTigjSguBC4xJU")
+		  .setOAuthAccessToken("CAAIxc0whCzEBAMMWngCLZAEZAraxeU7tPbKQMRKDdYK2In1uBXIBFs12EElmh8dPzy3mxC8T6z6CEFSRVgspppEkB6bQocyEMORYhtoALw7nZCcCg0pwpa2u1bWTqEqz8CXuRC6FqFyRza5UR079xJ9XYVuWHLjul9UYZCqYbY94p2QRiBDsbIiVwLiD2QQVfw9LDKNyYgZDZD")
+		  .setOAuthPermissions("email,publish_stream");
+		FacebookFactory ff = new FacebookFactory(cb.build());
+		Facebook facebook = ff.getInstance();
+		
+		try {
+			
+			//facebook.searchPosts("");
+			String results = facebook.getPosts("techcrunch").toString();
+            String response;
+			try {
+				response = stringToJson(results);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+			System.out.println("facebook posts - " + 
+					facebook.getPosts("techcrunch"));
+		} catch (FacebookException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public static String stringToJson(String data) throws JSONException
+    {
+        // Create JSON object
+        JSONObject jsonObject = new JSONObject(data);
+        		//.fromObject(data);
+        JSONArray message = (JSONArray) jsonObject.get("message");
+        System.out.println("Message : "+message);
+        return "Done";
+    }
+
+
 	private void getTwitterFeedsFromTemplate() {
 		//TwitterConfigurationTemplate template = new TwitterConfigurationTemplate();		
 				//TwitterTemplate twitterTemplate = template.twitterTemplate();		
