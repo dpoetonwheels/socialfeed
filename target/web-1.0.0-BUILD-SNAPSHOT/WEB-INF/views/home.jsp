@@ -18,5 +18,12 @@
 	</tr>
 </c:forEach>
 
+<c:forEach items="${fbposts}" var="post">
+	<tr>
+		<td>${post.get("message")}</td>
+	</tr>
+</c:forEach>
+
+
 </body>
 </html>

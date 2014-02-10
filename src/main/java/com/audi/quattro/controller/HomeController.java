@@ -13,13 +13,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.conf.ConfigurationBuilder;
-import facebook4j.internal.org.json.JSONArray;
-import facebook4j.internal.org.json.JSONException;
-import facebook4j.internal.org.json.JSONObject;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.Facebook;
+import com.restfb.FacebookClient;
+import com.restfb.json.JsonObject;
+import com.restfb.types.User;
+
 import twitter4j.Query;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -70,7 +69,7 @@ public class HomeController {
 			e.printStackTrace();			
 		}
 		
-    	getFacebookFeeds();
+    	model.addAttribute("fbposts",  getFacebookFeeds());
     	
 		return "home";
 	}
@@ -97,63 +96,30 @@ public class HomeController {
         return tweets;
 	}
 	
-	private void getFacebookFeeds() {
-		//Facebook facebook = new FacebookFactory().getInstance();		
-		//facebook.setOAuthAppId("617321221655345", "0dac6987961e1eb770734913a3988f85");
-		//facebook.setOAuthPermissions(commaSeparetedPermissions);				
-		//facebook.setOAuthAccessToken(new facebook4j.auth.AccessToken("617321221655345|pfc-BNyh_SfvXvTigjSguBC4xJU"));
-		//.setOAuthAccessToken(new AccessToken("57f5ad619084289f0a32d724da8e5c9a", null));
+	private List<JsonObject> getFacebookFeeds() {
 		
-		// Get an access token from: 
-		// https://developers.facebook.com/tools/explorer
-		// Copy and paste it below.
-		//String accessTokenString = "617321221655345|pfc-BNyh_SfvXvTigjSguBC4xJU";
-		//facebook4j.auth.AccessToken at = new facebook4j.auth.AccessToken(accessTokenString);
-		// Set access token.
-		//facebook.setOAuthAccessToken(at);
-		
-		
-		ConfigurationBuilder cb = new ConfigurationBuilder();
-		cb.setDebugEnabled(true)
-		  .setOAuthAppId("617321221655345")
-		  .setOAuthAppSecret("0dac6987961e1eb770734913a3988f85")
-		  //.setOAuthAccessToken("617321221655345|pfc-BNyh_SfvXvTigjSguBC4xJU")
-		  .setOAuthAccessToken("CAAIxc0whCzEBAMMWngCLZAEZAraxeU7tPbKQMRKDdYK2In1uBXIBFs12EElmh8dPzy3mxC8T6z6CEFSRVgspppEkB6bQocyEMORYhtoALw7nZCcCg0pwpa2u1bWTqEqz8CXuRC6FqFyRza5UR079xJ9XYVuWHLjul9UYZCqYbY94p2QRiBDsbIiVwLiD2QQVfw9LDKNyYgZDZD")
-		  .setOAuthPermissions("email,publish_stream");
-		FacebookFactory ff = new FacebookFactory(cb.build());
-		Facebook facebook = ff.getInstance();
-		
-		try {
-			
-			//facebook.searchPosts("");
-			String results = facebook.getPosts("techcrunch").toString();
-            String response;
-			try {
-				response = stringToJson(results);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            
-			System.out.println("facebook posts - " + 
-					facebook.getPosts("techcrunch"));
-		} catch (FacebookException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		FacebookClient facebookClient = new DefaultFacebookClient("CAAIxc0whCzEBAFfBlGGZAhRJTyflsTalxVGAuXMoAVc8i6TYV7810NhecFS3ZCUYZCZBlAO0i7ld3f0ZACA7VpcpHA3v0vEbM79RXB878IaXdU5OvuKLoqDVRyyotkyUt2DgJmyRRf7IihpiHnyF8wPkrCZBfAYR0qvqL0cD64JTZAXG3yszN1hvhYlkamZAcnXFSe0AWwHlIgZDZD");
+				
+		// Here's how to handle an FQL query
+
+		//String query = "SELECT uid, name FROM user WHERE uid=527118462";
+		String query = "SELECT message FROM stream WHERE (source_id IN (SELECT uid2 FROM friend WHERE uid1 = me()) OR source_id=me()  ) "
+				+ "AND strpos(lower(message),lower('#SanFrancisco')) >=0";
+		List<JsonObject> queryResults = facebookClient.executeFqlQuery(query, JsonObject.class);
+		System.out.println("User = " + queryResults.get(0));
+		return queryResults;
 		
 	}
 	
-	public static String stringToJson(String data) throws JSONException
-    {
-        // Create JSON object
-        JSONObject jsonObject = new JSONObject(data);
-        		//.fromObject(data);
-        JSONArray message = (JSONArray) jsonObject.get("message");
-        System.out.println("Message : "+message);
-        return "Done";
-    }
+//	public static String stringToJson(String data) throws JSONException
+//    {
+//        // Create JSON object
+//        JSONObject jsonObject = new JSONObject(data);
+//        		//.fromObject(data);
+//        JSONArray message = (JSONArray) jsonObject.get("message");
+//        System.out.println("Message : "+message);
+//        return "Done";
+//    }
 
 
 	private void getTwitterFeedsFromTemplate() {
@@ -164,4 +130,18 @@ public class HomeController {
 				
 	}
 	
+	public class FqlUser {
+		  @Facebook
+		  String uid;
+		  
+		  @Facebook
+		  String name;
+
+		  @Override
+		  public String toString() {
+		    return String.format("%s (%s)", name, uid);
+		  }
+		}
+	
 }
+
