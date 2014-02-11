@@ -65,7 +65,9 @@
 	</bean>
 				
 	<context:property-placeholder location="classpath:twitter.properties"/>			
+	<context:property-placeholder location="classpath:instagram.properties"/>						
+	<context:property-placeholder location="classpath:facebook.properties"/>									
 				
-	<context:component-scan base-package="com.audi.quattro.controller" />
+	<context:component-scan base-package="com.audi.quattro" />
 		
 </beans>
