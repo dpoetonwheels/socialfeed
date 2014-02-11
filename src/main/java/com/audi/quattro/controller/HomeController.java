@@ -100,6 +100,7 @@ public class HomeController {
 		List<Status> tweets = new ArrayList<Status>();
 		try {
 			tweets = twitterTemplate.twitterBean().search(query).getTweets();
+			
 		} catch (TwitterException e) {
 			e.printStackTrace();
 		}
