@@ -11,7 +11,7 @@
 
 <P>  The time on the server is ${serverTime}. </P>
 
-<p> Twitter Feeds from a user with hashtag search</p>
+<p><strong>Twitter Feeds from a user with hashtag search</strong></p>
 <p>
 <c:forEach items="${tweets}" var="tweet">
 	<tr>
@@ -20,7 +20,7 @@
 </c:forEach>
 </p>
 
-<p> Facebook posts from a user with hashtag search</p>
+<p> <strong>Facebook posts from a user with hashtag search</strong></p>
 <p>
 <c:forEach items="${fbposts}" var="post">
 	<tr>
@@ -29,10 +29,10 @@
 </c:forEach>
 </p>
 
-<p> Instagram posts from specific user.</p>
+<p> <strong>Instagram posts from specific user.</strong></p>
 <p>
 <tr>
-	<td>Instagram Picture - ${instauser.getFullName()}</td>
+	Instagram Picture - ${instauser.getFullName()}
 </tr>
 </p>
 
