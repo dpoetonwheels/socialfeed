@@ -6,11 +6,10 @@
 </head>
 <body>
 <h1>
-	Hello world!  
+	Social Feeds
 </h1>
 
 <P>  The time on the server is ${serverTime}. </P>
-<p>Twitter template = ${screenName} </p>
 
 <p> Twitter Feeds from a user with hashtag search
 <c:forEach items="${tweets}" var="tweet">
@@ -29,6 +28,9 @@
 </p>
 
 <p> Instagram posts from specific user.
+<tr>
+	<td>Instagram Picture - ${instauser.getFullName()}</td>
+</tr>
 </p>
 
 </body>
